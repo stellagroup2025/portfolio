@@ -157,3 +157,35 @@ Para consultas o soporte:
 - 📧 Email: [info@empresa-higtech.com](mailto:info@empresa-higtech.com)
 - 🌎 Web: [https://empresa-higtech.com](https://empresa-higtech.com)
 - 📍 Ubicación: Madrid, España
+
+🔗 Colaboración en el Proyecto
+Si eres colaborador en este repositorio, sigue estos pasos para trabajar en el proyecto:
+
+Clonar el repositorio (solo la primera vez):
+
+bash
+Copiar
+Editar
+git clone https://github.com/TU_USUARIO/empresa-higtech-front.git
+cd empresa-higtech-front
+Actualizar el código antes de trabajar:
+
+bash
+Copiar
+Editar
+git pull origin main
+Crear una nueva rama para cada cambio:
+
+bash
+Copiar
+Editar
+git checkout -b feature/nueva-funcionalidad
+Añadir cambios y subirlos:
+
+bash
+Copiar
+Editar
+git add .
+git commit -m "Descripción breve del cambio"
+git push origin feature/nueva-funcionalidad
+Crear un Pull Request (PR) en GitHub para revisión y fusión en main.
