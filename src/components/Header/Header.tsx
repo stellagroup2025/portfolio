@@ -1,73 +1,129 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Search, ShoppingCart, User, Menu, X, Sun, Moon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import {
+  Search,
+  Briefcase,
+  User,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Globe,
+  Mail,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
-  SheetClose
-} from '@/components/ui/sheet'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { motion } from 'framer-motion'
+  SheetClose,
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { useProfile } from "@/lib/hooks/useProfile";
 
 export default function Header() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const pathname = usePathname()
+  const { resolvedTheme, setTheme } = useTheme();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  // Get profile data
+  const { data: profile, profileType } = useProfile();
+
+  const isSpanish = pathname?.includes("/es");
+
+  // After mounting, we have access to the theme
+  useEffect(() => setMounted(true), []);
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    document.documentElement.classList.toggle('dark')
+    setTheme(resolvedTheme === "light" ? "dark" : "light");
+  };
+
+  // Enlaces acorde a un portafolio profesional
+  const navItems = isSpanish
+    ? [
+        { name: "Inicio", href: isSpanish ? "/es" : "/" },
+        { name: "Servicios", href: "#servicios" },
+        { name: "Proyectos", href: "#proyectos" },
+        { name: "AI", href: "#AiSection" },
+        // { name: 'Testimonios', href: '#testimonios' },
+        { name: "Contacto", href: "#contacto" },
+      ]
+    : [
+        { name: "Home", href: isSpanish ? "/es" : "/" },
+        { name: "Services", href: "#servicios" },
+        { name: "Projects", href: "#proyectos" },
+        { name: "AI", href: "#AiSection" },
+
+        // { name: 'Testimonials', href: '#testimonios' },
+        { name: "Contact", href: "#contacto" },
+      ];
+
+  // Don't render theme-specific parts until mounted (client-side)
+  if (!mounted) {
+    return (
+      <header className="w-full bg-transparent backdrop-blur-[4px] z-10">
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between">
+            {/* Simplified loading state */}
+            <div className="h-10 w-32"></div>
+            <nav className="hidden lg:flex items-center space-x-4">
+              {navItems.map((item) => (
+                <div key={item.name} className="h-10 w-24"></div>
+              ))}
+            </nav>
+            <div className="flex items-center space-x-2">
+              <div className="h-10 w-10"></div>
+              <div className="h-10 w-10"></div>
+              <div className="h-10 w-10"></div>
+              <div className="hidden sm:block h-10 w-32"></div>
+              <div className="lg:hidden h-10 w-10"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
   }
 
-  // ✅ Enlaces corregidos
-  const navItems = [
-    { name: 'Inicio', href: '/' },
-    { name: 'BlackGestionTime', href: '/blackgestiontime' },
-    { name: 'Páginas Web a Medida', href: '/paginas-web-a-medida' },
-    { name: 'Proyecto AI Teacher', href: '/aiteacher' }
-  ]
-
-  const cartItemCount = 3
-
   return (
-    <header className='w-full border-b border-gray-200 bg-white'>
+    <header className="w-full bg-transparent backdrop-blur-[4px] fixed top-0 left-0 right-0 z-50">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className='container mx-auto px-4'
+        className="container mx-auto px-4 py-2"
       >
-        <div className='flex h-16 items-center justify-between'>
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
-            href='/'
-            className='flex items-center border border-gray-300 rounded-md p-2'
+            href={isSpanish ? "/es" : "/"}
+            className="flex items-center border border-white/20 rounded-full p-2 geo-card"
           >
-            <span className='text-xl font-bold text-black'>TechCompany</span>
+            <span className="text-xl font-bold text-foreground">
+              {profile.name}
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className='hidden lg:flex items-center space-x-4'>
+          <nav className="hidden lg:flex items-center space-x-4">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium border border-gray-300 text-black transition ${
-                  pathname === item.href ? 'bg-gray-100' : 'hover:bg-gray-200'
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium border border-white/10 text-foreground transition ${
+                  pathname === item.href ? "bg-white/10" : "hover:bg-white/5"
+                } geo-card`}
               >
                 {item.name}
               </Link>
@@ -75,130 +131,124 @@ export default function Header() {
           </nav>
 
           {/* Right side items */}
-          <div className='flex items-center space-x-2'>
-            {/* Search */}
-            <div className='relative border border-gray-300 rounded-md'>
-              {isSearchOpen ? (
-                <div className='absolute right-0 top-0 w-60 flex items-center'>
-                  <Input
-                    className='rounded-l-md bg-gray-100 text-black'
-                    placeholder='Buscar...'
-                    autoFocus
-                    onBlur={() => setIsSearchOpen(false)}
-                  />
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='rounded-l-none'
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    <X className='h-4 w-4 stroke-black' />
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  onClick={() => setIsSearchOpen(true)}
-                >
-                  <Search className='h-5 w-5 stroke-black' />
-                </Button>
-              )}
-            </div>
-
-            {/* Theme Toggle */}
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={toggleTheme}
-              className='border border-gray-300 rounded-md'
-            >
-              {theme === 'light' ? (
-                <Moon className='h-5 w-5 stroke-black' />
-              ) : (
-                <Sun className='h-5 w-5 stroke-black' />
-              )}
-            </Button>
-
-            {/* Shopping Cart */}
-            <Button
-              variant='ghost'
-              size='icon'
-              className='relative border border-gray-300 rounded-md'
-              asChild
-            >
-              <Link href='/carrito'>
-                <ShoppingCart className='h-5 w-5 stroke-black' />
-                {cartItemCount > 0 && (
-                  <Badge className='absolute -top-2 -right-2 px-1.5 py-0.5 text-xs'>
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
-
-            {/* User Menu */}
+          <div className="flex items-center space-x-2">
+            {/* Profile Switcher */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='border border-gray-300 rounded-md'
-                >
-                  <User className='h-5 w-5 stroke-black' />
-                </Button>
+                <div className="border border-white/20 rounded-full geo-card flex items-center justify-center w-9 h-9 cursor-pointer hover:bg-white/5 transition-colors">
+                  <User className="h-5 w-5 stroke-foreground" />
+                </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuItem asChild>
-                  <Link href='/login' className='text-black'>
-                    Iniciar sesión
-                  </Link>
+              <DropdownMenuContent
+                align="end"
+                className="geo-card border-white/10 bg-background/70 backdrop-blur-lg text-foreground"
+              >
+                <DropdownMenuItem
+                  onClick={() => {
+                    window.localStorage.setItem("profile-config", "OMAR");
+                    window.location.reload();
+                  }}
+                  className={`hover:bg-white/10 cursor-pointer ${
+                    profileType === "OMAR" ? "bg-white/10" : ""
+                  }`}
+                >
+                  Wakanda Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href='/registro' className='text-black'>
-                    Registrarse
-                  </Link>
+                <DropdownMenuItem
+                  onClick={() => {
+                    window.localStorage.setItem("profile-config", "JAVIER");
+                    window.location.reload();
+                  }}
+                  className={`hover:bg-white/10 cursor-pointer ${
+                    profileType === "JAVIER" ? "bg-white/10" : ""
+                  }`}
+                >
+                  Talokan Profile
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="border border-white/20 rounded-full geo-card flex items-center justify-center w-9 h-9 cursor-pointer hover:bg-white/5 transition-colors">
+                  <Globe className="h-5 w-5 stroke-foreground" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="geo-card border-white/10 bg-background/70 backdrop-blur-lg text-foreground"
+              >
+                <DropdownMenuItem
+                  onClick={() => (window.location.href = "/")}
+                  className="hover:bg-white/10 cursor-pointer"
+                >
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => (window.location.href = "/es")}
+                  className="hover:bg-white/10 cursor-pointer"
+                >
+                  Español
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Theme Toggle */}
+            <div
+              onClick={toggleTheme}
+              className="border border-white/20 rounded-full geo-card flex items-center justify-center w-9 h-9 cursor-pointer hover:bg-white/5 transition-colors"
+            >
+              {resolvedTheme === "light" ? (
+                <Moon className="h-5 w-5 stroke-foreground" />
+              ) : (
+                <Sun className="h-5 w-5 stroke-foreground" />
+              )}
+            </div>
+
             {/* CTA Button */}
-            <Button className='hidden sm:flex border border-gray-300 text-black'>
-              Comprar ahora
-            </Button>
+            <a
+              href="#contacto"
+              className="hidden sm:flex border border-white/20 bg-white/5 text-foreground rounded-full hover:bg-white/10 geo-card px-4 py-2 items-center text-sm font-medium"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              {isSpanish ? "Contactar" : "Contact Me"}
+            </a>
 
             {/* Mobile Menu */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='lg:hidden border border-gray-300 rounded-md'
-                >
-                  <Menu className='h-5 w-5 stroke-black' />
-                </Button>
+                <div className="lg:hidden border border-white/20 rounded-full geo-card flex items-center justify-center w-9 h-9 cursor-pointer hover:bg-white/5 transition-colors">
+                  <Menu className="h-5 w-5 stroke-foreground" />
+                </div>
               </SheetTrigger>
-              <SheetContent side='right'>
-                <nav className='flex flex-col space-y-4 mt-8'>
+              <SheetContent side="right" className="geo-bg border-none">
+                <nav className="flex flex-col space-y-4 mt-8">
                   {navItems.map((item) => (
-                    <SheetClose asChild key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={`px-3 py-2 rounded-md text-sm font-medium border border-gray-300 text-black transition ${
-                          pathname === item.href
-                            ? 'bg-gray-100'
-                            : 'hover:bg-gray-200'
-                        }`}
-                      >
-                        {item.name}
-                      </Link>
-                    </SheetClose>
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`px-3 py-2 rounded-full text-sm font-medium border border-white/10 text-foreground transition ${
+                        pathname === item.href
+                          ? "bg-white/10"
+                          : "hover:bg-white/5"
+                      } geo-card`}
+                      onClick={() =>
+                        document
+                          .querySelector("[data-radix-collection-item]")
+                          ?.click()
+                      }
+                    >
+                      {item.name}
+                    </Link>
                   ))}
-                  <SheetClose asChild>
-                    <Button className='w-full border border-gray-300 text-black'>
-                      Comprar ahora
-                    </Button>
-                  </SheetClose>
+                  <a
+                    href="#contacto"
+                    className="flex border border-white/20 bg-white/5 text-foreground rounded-full hover:bg-white/10 geo-card px-4 py-2 items-center text-sm font-medium justify-center"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    {isSpanish ? "Contactar" : "Contact Me"}
+                  </a>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -206,5 +256,5 @@ export default function Header() {
         </div>
       </motion.div>
     </header>
-  )
+  );
 }
